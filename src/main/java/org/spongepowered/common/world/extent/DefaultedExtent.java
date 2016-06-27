@@ -50,6 +50,7 @@ import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBiomeAreaWorker;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
 import org.spongepowered.common.world.schematic.CharArraySchematicVolume;
+import org.spongepowered.common.world.schematic.GlobalPalette;
 
 /**
  * The Extent interface with extra defaults that are only available in the implementation.
@@ -145,9 +146,8 @@ public interface DefaultedExtent extends Extent {
     }
     
     @Override
-    default ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin, PaletteType type) {
-        Palette palette = type.create();
-        CharArraySchematicVolume volume = new CharArraySchematicVolume(palette, min.sub(origin), max.sub(origin));
+    default ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, boolean storeEntities) {
+        CharArraySchematicVolume volume = new CharArraySchematicVolume(GlobalPalette.instance, min, max);
         Extent area = getExtentView(min, max);
         area.getBlockWorker().map((extent, x, y, z)->{
             return extent.getBlock(x, y, z);

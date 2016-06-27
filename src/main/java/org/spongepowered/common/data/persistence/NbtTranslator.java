@@ -165,7 +165,6 @@ public final class NbtTranslator implements DataTranslator<NBTTagCompound> {
         throw new IllegalArgumentException("Unable to translate object to NBTBase: " + value);
     }
 
-    @SuppressWarnings("unchecked")
     private static DataContainer getViewFromCompound(NBTTagCompound compound) {
         checkNotNull(compound);
         DataContainer container = new MemoryDataContainer();

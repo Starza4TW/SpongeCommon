@@ -28,6 +28,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.world.schematic.Palette;
+import org.spongepowered.api.world.schematic.PaletteType;
+import org.spongepowered.api.world.schematic.PaletteTypes;
 
 import java.util.BitSet;
 import java.util.Optional;
@@ -49,6 +51,11 @@ public class BimapPalette implements Palette {
     public BimapPalette(int expectedSize) {
         this.ids = HashBiMap.create(expectedSize);
         this.idsr = this.ids.inverse();
+    }
+
+    @Override
+    public PaletteType getType() {
+        return PaletteTypes.LOCAL;
     }
 
     @Override
