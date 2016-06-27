@@ -86,6 +86,7 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
 
     @Override
     public DataContainer translate(Schematic obj) throws InvalidDataException {
+        DataContainer data = new NonCloningDataContainer();
         // TODO Auto-generated method stub
         return null;
     }
