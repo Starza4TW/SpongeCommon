@@ -43,16 +43,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CharArraySchematicVolume extends CharArrayMutableBlockBuffer implements ArchetypeVolume {
+public class CharArrayArchetypeVolume extends CharArrayMutableBlockBuffer implements ArchetypeVolume {
 
     private final Map<Vector3i, TileEntityArchetype> tiles = Maps.newHashMap();
     private final List<EntityArchetype> entities = Lists.newArrayList();
 
-    public CharArraySchematicVolume(Vector3i start, Vector3i size) {
+    public CharArrayArchetypeVolume(Vector3i start, Vector3i size) {
         super(start, size);
     }
 
-    public CharArraySchematicVolume(Palette palette, Vector3i start, Vector3i size) {
+    public CharArrayArchetypeVolume(Palette palette, Vector3i start, Vector3i size) {
         super(palette, start, size);
     }
 

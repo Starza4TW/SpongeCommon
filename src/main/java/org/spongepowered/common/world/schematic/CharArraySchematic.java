@@ -33,7 +33,7 @@ import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
 
-public class CharArraySchematic extends CharArraySchematicVolume implements Schematic {
+public class CharArraySchematic extends CharArrayArchetypeVolume implements Schematic {
 
     private DataContainer metadata;
 

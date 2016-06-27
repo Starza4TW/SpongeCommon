@@ -49,7 +49,7 @@ import org.spongepowered.common.util.gen.CharArrayImmutableBlockBuffer;
 import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBiomeAreaWorker;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
-import org.spongepowered.common.world.schematic.CharArraySchematicVolume;
+import org.spongepowered.common.world.schematic.CharArrayArchetypeVolume;
 import org.spongepowered.common.world.schematic.GlobalPalette;
 
 /**
@@ -146,11 +146,14 @@ public interface DefaultedExtent extends Extent {
     }
     
     @Override
-    default ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, boolean storeEntities) {
-        CharArraySchematicVolume volume = new CharArraySchematicVolume(GlobalPalette.instance, min, max);
+    default ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin, boolean storeEntities) {
+        CharArrayArchetypeVolume volume = new CharArrayArchetypeVolume(GlobalPalette.instance, min.sub(origin), max.sub(origin));
         Extent area = getExtentView(min, max);
-        area.getBlockWorker().map((extent, x, y, z)->{
-            return extent.getBlock(x, y, z);
+        int ox = origin.getX();
+        int oy = origin.getY();
+        int oz = origin.getZ();
+        area.getBlockWorker().map((extent, x, y, z) -> {
+            return extent.getBlock(x + ox, y + oy, z + oz);
         }, volume);
         // TODO create tile entity / entity archetypes
         return volume;
