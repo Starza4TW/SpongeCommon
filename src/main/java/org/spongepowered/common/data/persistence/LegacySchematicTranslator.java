@@ -27,7 +27,6 @@ package org.spongepowered.common.data.persistence;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.DataTranslator;
@@ -76,23 +75,23 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
         // (which is not in the sponge schematic specification) is not present
         // then it is more likely that its a sponge schematic than a legacy
         // schematic
-        String materials = view.getString(DataQueries.LegacySchematic.MATERIALS).orElse("Sponge");
+        String materials = view.getString(DataQueries.Schematic.LEGACY_MATERIALS).orElse("Sponge");
         if ("Sponge".equalsIgnoreCase(materials)) {
             // not a legacy schematic use the new loader instead.
             return DataTranslators.SCHEMATIC.translate(view);
         } else if (!"Alpha".equalsIgnoreCase(materials)) {
             throw new InvalidDataException(String.format("Schematic specifies unknown materials %s", materials));
         }
-        int width = view.getShort(DataQueries.LegacySchematic.WIDTH).get();
-        int height = view.getShort(DataQueries.LegacySchematic.HEIGHT).get();
-        int length = view.getShort(DataQueries.LegacySchematic.LENGTH).get();
+        int width = view.getShort(DataQueries.Schematic.WIDTH).get();
+        int height = view.getShort(DataQueries.Schematic.HEIGHT).get();
+        int length = view.getShort(DataQueries.Schematic.LENGTH).get();
         if (width > MAX_SIZE || height > MAX_SIZE || length > MAX_SIZE) {
             throw new InvalidDataException(String.format(
                     "Schematic is larger than maximum allowable size (found: (%d, %d, %d) max: (%d, %<d, %<d)", width, height, length, MAX_SIZE));
         }
-        int offsetX = view.getInt(DataQueries.LegacySchematic.OFFSET_X).orElse(0);
-        int offsetY = view.getInt(DataQueries.LegacySchematic.OFFSET_Y).orElse(0);
-        int offsetZ = view.getInt(DataQueries.LegacySchematic.OFFSET_Z).orElse(0);
+        int offsetX = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_X).orElse(0);
+        int offsetY = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_Y).orElse(0);
+        int offsetZ = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_Z).orElse(0);
         Palette palette = new BimapPalette();
         CharArraySchematic schematic =
                 new CharArraySchematic(palette, new Vector3i(-offsetX, -offsetY, -offsetZ), new Vector3i(width - 1, height - 1, length - 1));
@@ -115,23 +114,23 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
             throw new IllegalArgumentException(String.format(
                     "Schematic is larger than maximum allowable size (found: (%d, %d, %d) max: (%d, %<d, %<d)", width, height, length, MAX_SIZE));
         }
-        data.set(DataQueries.LegacySchematic.WIDTH, width);
-        data.set(DataQueries.LegacySchematic.HEIGHT, height);
-        data.set(DataQueries.LegacySchematic.LENGTH, length);
-        data.set(DataQuery.of("Materials"), "Alpha");
+        data.set(DataQueries.Schematic.WIDTH, width);
+        data.set(DataQueries.Schematic.HEIGHT, height);
+        data.set(DataQueries.Schematic.LENGTH, length);
+        data.set(DataQueries.Schematic.LEGACY_MATERIALS, "Alpha");
         // These are added for better interop with WorldEdit
-        data.set(DataQuery.of("WEOffsetX"), xMin);
-        data.set(DataQuery.of("WEOffsetY"), yMin);
-        data.set(DataQuery.of("WEOffsetZ"), zMin);
+        data.set(DataQueries.Schematic.LEGACY_OFFSET_X, xMin);
+        data.set(DataQueries.Schematic.LEGACY_OFFSET_Y, yMin);
+        data.set(DataQueries.Schematic.LEGACY_OFFSET_Z, zMin);
         SaveIterator itr = new SaveIterator(width, height, length);
         schematic.getBlockWorker().iterate(itr);
         byte[] blockids = itr.blockids;
         byte[] extraids = itr.extraids;
         byte[] blockdata = itr.blockdata;
-        data.set(DataQuery.of("Blocks"), blockids);
-        data.set(DataQuery.of("Data"), blockdata);
+        data.set(DataQueries.Schematic.LEGACY_BLOCKS, blockids);
+        data.set(DataQueries.Schematic.LEGACY_BLOCK_DATA, blockdata);
         if (extraids != null) {
-            data.set(DataQuery.of("AddBlocks"), extraids);
+            data.set(DataQueries.Schematic.LEGACY_ADD_BLOCKS, extraids);
         }
         // TODO extract entities ?
         return data;
