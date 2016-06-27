@@ -26,6 +26,7 @@ package org.spongepowered.common.data.persistence;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
@@ -92,11 +93,28 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
         int offsetX = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_X).orElse(0);
         int offsetY = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_Y).orElse(0);
         int offsetZ = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_Z).orElse(0);
-        Palette palette = new BimapPalette();
+        Palette palette = GlobalPalette.instance;
         CharArraySchematic schematic =
                 new CharArraySchematic(palette, new Vector3i(-offsetX, -offsetY, -offsetZ), new Vector3i(width - 1, height - 1, length - 1));
 
-        // TODO
+        byte[] block_ids = (byte[]) view.get(DataQueries.Schematic.LEGACY_BLOCKS).get();
+        byte[] block_data = (byte[]) view.get(DataQueries.Schematic.LEGACY_BLOCK_DATA).get();
+        byte[] add_block = (byte[]) view.get(DataQueries.Schematic.LEGACY_ADD_BLOCKS).orElse(null);
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < width; y++) {
+                for (int z = 0; z < width; z++) {
+                    int index = (y * length + z) * width + x;
+                    int palette_id = (block_ids[index] << 4) | (block_data[index] & 0xFF);
+                    if(add_block != null) {
+                        palette_id |= add_block[index] << 12;
+                    }
+                    BlockState block = palette.get(palette_id).get();
+                    schematic.setBlock(x, y, z, block);
+                }
+            }
+        }
+        // TODO load tile entities
+        // TODO load entities
 
         return schematic;
     }
@@ -132,7 +150,7 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
         if (extraids != null) {
             data.set(DataQueries.Schematic.LEGACY_ADD_BLOCKS, extraids);
         }
-        // TODO extract entities ?
+        // TODO extract entities
         return data;
     }
 
