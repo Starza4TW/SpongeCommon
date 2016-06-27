@@ -49,7 +49,7 @@ import org.spongepowered.common.util.gen.CharArrayImmutableBlockBuffer;
 import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBiomeAreaWorker;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
-import org.spongepowered.common.world.schematic.CharArrayArchetypeVolume;
+import org.spongepowered.common.world.schematic.SpongeArchetypeVolume;
 import org.spongepowered.common.world.schematic.GlobalPalette;
 
 /**
@@ -147,7 +147,7 @@ public interface DefaultedExtent extends Extent {
     
     @Override
     default ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin, boolean storeEntities) {
-        CharArrayArchetypeVolume volume = new CharArrayArchetypeVolume(GlobalPalette.instance, min.sub(origin), max.sub(origin));
+        SpongeArchetypeVolume volume = new SpongeArchetypeVolume(GlobalPalette.instance, min.sub(origin), max.sub(origin));
         Extent area = getExtentView(min, max);
         int ox = origin.getX();
         int oy = origin.getY();

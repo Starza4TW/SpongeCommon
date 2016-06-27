@@ -24,26 +24,25 @@
  */
 package org.spongepowered.common.world.schematic;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.world.extent.ArchetypeVolume;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
-import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
 
-public class CharArraySchematic extends CharArrayArchetypeVolume implements Schematic {
+public class SpongeSchematic extends SpongeArchetypeVolume implements Schematic {
 
     private DataContainer metadata;
 
-    public CharArraySchematic(Vector3i start, Vector3i size) {
-        this(GlobalPalette.instance, start, size);
+    public SpongeSchematic(MutableBlockVolume backing) {
+        super(backing);
+        this.metadata = new MemoryDataContainer();
     }
 
-    public CharArraySchematic(Palette palette, Vector3i start, Vector3i size) {
-        super(palette, start, size);
-        this.metadata = new MemoryDataContainer();
+    public SpongeSchematic(MutableBlockVolume backing, DataContainer metadata) {
+        super(backing);
+        this.metadata = metadata;
     }
 
     @Override

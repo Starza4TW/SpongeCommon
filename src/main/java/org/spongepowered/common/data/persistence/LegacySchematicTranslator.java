@@ -38,7 +38,7 @@ import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.common.data.util.DataQueries;
 import org.spongepowered.common.world.schematic.BimapPalette;
-import org.spongepowered.common.world.schematic.CharArraySchematic;
+import org.spongepowered.common.world.schematic.SpongeSchematic;
 import org.spongepowered.common.world.schematic.GlobalPalette;
 
 public class LegacySchematicTranslator implements DataTranslator<Schematic> {
@@ -94,8 +94,8 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
         int offsetY = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_Y).orElse(0);
         int offsetZ = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_Z).orElse(0);
         Palette palette = GlobalPalette.instance;
-        CharArraySchematic schematic =
-                new CharArraySchematic(palette, new Vector3i(-offsetX, -offsetY, -offsetZ), new Vector3i(width - 1, height - 1, length - 1));
+        SpongeSchematic schematic =
+                new SpongeSchematic(palette, new Vector3i(-offsetX, -offsetY, -offsetZ), new Vector3i(width - 1, height - 1, length - 1));
 
         byte[] block_ids = (byte[]) view.get(DataQueries.Schematic.LEGACY_BLOCKS).get();
         byte[] block_data = (byte[]) view.get(DataQueries.Schematic.LEGACY_BLOCK_DATA).get();

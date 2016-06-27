@@ -38,15 +38,15 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
     private static final TypeToken<Schematic> TYPE_TOKEN = TypeToken.of(Schematic.class);
     private static final int VERSION = 1;
     private static final int MAX_SIZE = 65535;
-    
+
     public static SchematicTranslator get() {
         return INSTANCE;
     }
-    
+
     private SchematicTranslator() {
-        
+
     }
-    
+
     @Override
     public String getId() {
         return "sponge:schematic";
@@ -66,7 +66,7 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
     public Schematic translate(DataView view) throws InvalidDataException {
         int version = view.getInt(DataQueries.Schematic.VERSION).get();
         // TODO version conversions
-        if(version != VERSION) {
+        if (version != VERSION) {
             throw new InvalidDataException(String.format("Unknown schematic version %d (current version is %d)", version, VERSION));
         }
         DataView metadata = view.getView(DataQueries.Schematic.METADATA).orElse(null);
@@ -78,9 +78,22 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
             throw new InvalidDataException(String.format(
                     "Schematic is larger than maximum allowable size (found: (%d, %d, %d) max: (%d, %<d, %<d)", width, height, length, MAX_SIZE));
         }
+
+        int[] offset = (int[]) view.get(DataQueries.Schematic.OFFSET).orElse(null);
+        if (offset == null) {
+            offset = new int[3];
+        }
+        if(offset.length < 3) {
+            throw new InvalidDataException("Schematic offset was not of length 3");
+        }
         
-        // TODO
+        int palette_max = view.getInt(DataQueries.Schematic.PALETTE_MAX).orElse(4);
         
+        Schematic schematic;
+        if(palette_max == 1) {
+            schematic = new ByteArray
+        }
+
         return null;
     }
 

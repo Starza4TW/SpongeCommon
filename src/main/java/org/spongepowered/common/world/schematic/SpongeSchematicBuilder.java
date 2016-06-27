@@ -4,14 +4,27 @@
  */
 package org.spongepowered.common.world.schematic;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Maps;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.PaletteType;
 import org.spongepowered.api.world.schematic.PaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.api.world.schematic.Schematic.Builder;
+import org.spongepowered.common.data.persistence.NonCloningDataContainer;
+import org.spongepowered.common.util.gen.ByteArrayMutableBlockBuffer;
+import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
+import org.spongepowered.common.util.gen.IntArrayMutableBlockBuffer;
+
+import java.util.Map;
 
 public class SpongeSchematicBuilder implements Schematic.Builder {
 
@@ -21,7 +34,9 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
     private PaletteType type = PaletteTypes.LOCAL;
     private Vector3i origin;
     private boolean storeEntities;
-    
+    private DataContainer metadata;
+    private Map<String, Object> metaValues = Maps.newHashMap();
+
     @Override
     public Builder volume(ArchetypeVolume volume) {
         this.volume = volume;
@@ -61,6 +76,18 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
     }
 
     @Override
+    public Builder metadata(DataContainer metadata) {
+        this.metadata = metadata;
+        return this;
+    }
+
+    @Override
+    public Builder metaValue(String key, Object value) {
+        this.metaValues.put(key, value);
+        return this;
+    }
+
+    @Override
     public Builder from(Schematic value) {
         // TODO Auto-generated method stub
         return null;
@@ -74,14 +101,46 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
 
     @Override
     public Schematic build() throws IllegalArgumentException {
-        if(this.palette == null) {
+        if (this.palette == null) {
             this.palette = this.type.create();
-            if(this.type == PaletteTypes.LOCAL) {
-                //TODO fill palette from area;
+            if (this.type == PaletteTypes.LOCAL) {
+                // TODO fill palette from area;
             }
         }
-        CharArraySchematic schematic = new CharArraySchematic(this.palette, this.volume.getBlockMin(), this.volume.getBlockSize());
-        // TODO
+        checkArgument(this.volume != null || this.view != null);
+        Vector3i min;
+        Vector3i size;
+        if (this.volume != null) {
+            min = this.volume.getBlockMin();
+            size = this.volume.getBlockSize();
+        } else {
+            min = this.view.getBlockMin();
+            size = this.view.getBlockSize();
+        }
+        final MutableBlockVolume volume;
+        if (this.palette.getHighestId() <= 0xFF) {
+            volume = new ByteArrayMutableBlockBuffer(this.palette, min, size);
+        } else if (this.palette.getHighestId() <= 0xFF) {
+            volume = new CharArrayMutableBlockBuffer(this.palette, min, size);
+        } else {
+            volume = new IntArrayMutableBlockBuffer(this.palette, min, size);
+        }
+        if (this.volume != null) {
+            this.volume.getBlockWorker().iterate((v, x, y, z)->{
+                volume.setBlock(x, y, z, v.getBlock(x, y, z));
+            });
+        } else {
+            this.view.getBlockWorker().iterate((v, x, y, z)->{
+                volume.setBlock(x, y, z, v.getBlock(x, y, z));
+            });
+        }
+        if(this.metadata == null) {
+            this.metadata = new MemoryDataContainer();
+        }
+        for(Map.Entry<String, Object> entry: this.metaValues.entrySet()) {
+            this.metadata.set(DataQuery.of(".", entry.getKey()), entry.getValue());
+        }
+        SpongeSchematic schematic = new SpongeSchematic(volume, this.metadata);
         return schematic;
     }
 
