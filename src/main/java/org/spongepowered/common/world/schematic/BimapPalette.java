@@ -88,6 +88,14 @@ public class BimapPalette implements Palette {
         return Optional.ofNullable(this.ids.get(id));
     }
 
+    public void assign(BlockState state, int id) {
+        if (this.maxId < id) {
+            this.maxId = id;
+        }
+        this.allocation.set(id);
+        this.ids.put(id, state);
+    }
+
     @Override
     public boolean remove(BlockState state) {
         Integer id = this.idsr.get(state);

@@ -29,7 +29,6 @@ import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataTranslators;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -38,10 +37,9 @@ import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.common.data.util.DataQueries;
 import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
-import org.spongepowered.common.world.schematic.BimapPalette;
-import org.spongepowered.common.world.schematic.SpongeSchematic;
 import org.spongepowered.common.world.schematic.GlobalPalette;
 import org.spongepowered.common.world.schematic.SpongeArchetypeVolume;
+import org.spongepowered.common.world.schematic.SpongeSchematic;
 
 public class LegacySchematicTranslator implements DataTranslator<Schematic> {
 
@@ -97,7 +95,7 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
         int offsetZ = view.getInt(DataQueries.Schematic.LEGACY_OFFSET_Z).orElse(0);
         Palette palette = GlobalPalette.instance;
         CharArrayMutableBlockBuffer buffer =
-                new CharArrayMutableBlockBuffer(new Vector3i(-offsetX, -offsetY, -offsetZ), new Vector3i(width, height, length));
+                new CharArrayMutableBlockBuffer(palette, new Vector3i(-offsetX, -offsetY, -offsetZ), new Vector3i(width, height, length));
         byte[] block_ids = (byte[]) view.get(DataQueries.Schematic.LEGACY_BLOCKS).get();
         byte[] block_data = (byte[]) view.get(DataQueries.Schematic.LEGACY_BLOCK_DATA).get();
         byte[] add_block = (byte[]) view.get(DataQueries.Schematic.LEGACY_ADD_BLOCKS).orElse(null);

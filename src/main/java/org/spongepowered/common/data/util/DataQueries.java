@@ -216,7 +216,9 @@ public final class DataQueries {
         public static final DataQuery LENGTH = of("Length");
 
         public static final DataQuery OFFSET = of("Offset");
+        public static final DataQuery PALETTE = of("Palette");
         public static final DataQuery PALETTE_MAX = of("PaletteMax");
+        public static final DataQuery BLOCK_DATA = of("BlockData");
 
         public static final DataQuery LEGACY_MATERIALS = of("Materials");
         

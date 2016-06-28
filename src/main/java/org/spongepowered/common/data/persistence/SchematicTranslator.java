@@ -24,13 +24,28 @@
  */
 package org.spongepowered.common.data.persistence;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
+import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.common.data.util.DataQueries;
+import org.spongepowered.common.util.gen.ByteArrayMutableBlockBuffer;
+import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
+import org.spongepowered.common.util.gen.IntArrayMutableBlockBuffer;
+import org.spongepowered.common.world.schematic.BimapPalette;
+import org.spongepowered.common.world.schematic.GlobalPalette;
+import org.spongepowered.common.world.schematic.SpongeSchematic;
+
+import java.util.Optional;
+import java.util.Set;
 
 public class SchematicTranslator implements DataTranslator<Schematic> {
 
@@ -71,6 +86,7 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
         }
         DataView metadata = view.getView(DataQueries.Schematic.METADATA).orElse(null);
 
+        // TODO error handling for these optionals
         int width = view.getShort(DataQueries.Schematic.WIDTH).get();
         int height = view.getShort(DataQueries.Schematic.HEIGHT).get();
         int length = view.getShort(DataQueries.Schematic.LENGTH).get();
@@ -83,14 +99,69 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
         if (offset == null) {
             offset = new int[3];
         }
-        if(offset.length < 3) {
+        if (offset.length < 3) {
             throw new InvalidDataException("Schematic offset was not of length 3");
         }
-        
+        Palette palette;
+        Optional<DataView> paletteData = view.getView(DataQueries.Schematic.PALETTE);
         int palette_max = view.getInt(DataQueries.Schematic.PALETTE_MAX).orElse(0xFFFF);
-        
-        Schematic schematic;
-        return null;
+        if (paletteData.isPresent()) {
+            // If we had a default palette_max we don't want to allocate all
+            // that space for nothing so we use a sensible default instead
+            palette = new BimapPalette(palette_max != 0xFFFF ? palette_max : 64);
+            DataView paletteMap = paletteData.get();
+            Set<DataQuery> paletteKeys = paletteMap.getKeys(false);
+            for (DataQuery key : paletteKeys) {
+                BlockState state = Sponge.getRegistry().getType(BlockState.class, key.getParts().get(0)).get();
+                ((BimapPalette) palette).assign(state, paletteMap.getInt(key).get());
+            }
+        } else {
+            palette = GlobalPalette.instance;
+        }
+
+        MutableBlockVolume buffer;
+        if (palette_max <= 0xFF) {
+            buffer = new ByteArrayMutableBlockBuffer(palette, new Vector3i(-offset[0], -offset[1], -offset[2]), new Vector3i(width, height, length));
+        } else if (palette_max <= 0xFF) {
+            buffer = new CharArrayMutableBlockBuffer(palette, new Vector3i(-offset[0], -offset[1], -offset[2]), new Vector3i(width, height, length));
+        } else {
+            buffer = new IntArrayMutableBlockBuffer(palette, new Vector3i(-offset[0], -offset[1], -offset[2]), new Vector3i(width, height, length));
+        }
+
+        byte[] blockdata = (byte[]) view.get(DataQueries.Schematic.BLOCK_DATA).get();
+
+        int index = 0;
+        int i = 0;
+        int value = 0;
+        int varint_length = 0;
+        while (i < blockdata.length) {
+            value = 0;
+            length = 0;
+
+            while (true) {
+                value |= (blockdata[i] & 127) << varint_length++ * 7;
+                if (varint_length > 5) {
+                    throw new RuntimeException("VarInt too big (probably corrupted data)");
+                }
+                if ((blockdata[i] & 128) != 128) {
+                    break;
+                }
+                i++;
+            }
+            // index = (y * length + z) * width + x
+            int y = index / (width * length);
+            int z = (index % (width * length)) / width;
+            int x = (index % (width * length)) % width;
+
+            BlockState state = palette.get(value).get();
+            buffer.setBlock(x - offset[0], y - offset[1], z - offset[2], state);
+
+            index++;
+        }
+        // TODO tile entities and entities
+
+        Schematic schematic = new SpongeSchematic(buffer, metadata);
+        return schematic;
     }
 
     @Override

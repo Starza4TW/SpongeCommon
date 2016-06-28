@@ -8,8 +8,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
@@ -19,7 +19,6 @@ import org.spongepowered.api.world.schematic.PaletteType;
 import org.spongepowered.api.world.schematic.PaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.api.world.schematic.Schematic.Builder;
-import org.spongepowered.common.data.persistence.NonCloningDataContainer;
 import org.spongepowered.common.util.gen.ByteArrayMutableBlockBuffer;
 import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
 import org.spongepowered.common.util.gen.IntArrayMutableBlockBuffer;
@@ -34,7 +33,7 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
     private PaletteType type = PaletteTypes.LOCAL;
     private Vector3i origin;
     private boolean storeEntities;
-    private DataContainer metadata;
+    private DataView metadata;
     private Map<String, Object> metaValues = Maps.newHashMap();
 
     @Override
@@ -76,7 +75,7 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
     }
 
     @Override
-    public Builder metadata(DataContainer metadata) {
+    public Builder metadata(DataView metadata) {
         this.metadata = metadata;
         return this;
     }

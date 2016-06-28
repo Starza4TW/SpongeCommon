@@ -25,6 +25,7 @@
 package org.spongepowered.common.world.schematic;
 
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
@@ -33,20 +34,20 @@ import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWork
 
 public class SpongeSchematic extends SpongeArchetypeVolume implements Schematic {
 
-    private DataContainer metadata;
+    private DataView metadata;
 
     public SpongeSchematic(MutableBlockVolume backing) {
         super(backing);
         this.metadata = new MemoryDataContainer();
     }
 
-    public SpongeSchematic(MutableBlockVolume backing, DataContainer metadata) {
+    public SpongeSchematic(MutableBlockVolume backing, DataView metadata) {
         super(backing);
         this.metadata = metadata;
     }
 
     @Override
-    public DataContainer getMetadata() {
+    public DataView getMetadata() {
         return this.metadata;
     }
 
