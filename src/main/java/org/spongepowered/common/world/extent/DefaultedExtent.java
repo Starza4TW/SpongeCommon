@@ -40,20 +40,20 @@ import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
-import org.spongepowered.api.world.extent.worker.procedure.BlockVolumeMapper;
-import org.spongepowered.api.world.schematic.Palette;
-import org.spongepowered.api.world.schematic.PaletteType;
 import org.spongepowered.common.util.gen.ByteArrayImmutableBiomeBuffer;
 import org.spongepowered.common.util.gen.ByteArrayMutableBiomeBuffer;
+import org.spongepowered.common.util.gen.ByteArrayMutableBlockBuffer;
 import org.spongepowered.common.util.gen.CharArrayImmutableBlockBuffer;
 import org.spongepowered.common.util.gen.CharArrayMutableBlockBuffer;
+import org.spongepowered.common.util.gen.IntArrayMutableBlockBuffer;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBiomeAreaWorker;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
+import org.spongepowered.common.world.schematic.BimapPalette;
 import org.spongepowered.common.world.schematic.SpongeArchetypeVolume;
-import org.spongepowered.common.world.schematic.GlobalPalette;
 
 /**
- * The Extent interface with extra defaults that are only available in the implementation.
+ * The Extent interface with extra defaults that are only available in the
+ * implementation.
  */
 public interface DefaultedExtent extends Extent {
 
@@ -83,7 +83,7 @@ public interface DefaultedExtent extends Extent {
         switch (type) {
             case STANDARD:
                 return new ByteArrayMutableBiomeBuffer(ExtentBufferUtil.copyToArray(this, getBiomeMin(), getBiomeMax(), getBiomeSize()),
-                    getBiomeMin(), getBiomeSize());
+                        getBiomeMin(), getBiomeSize());
             case THREAD_SAFE:
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -93,7 +93,7 @@ public interface DefaultedExtent extends Extent {
     @Override
     default ImmutableBiomeArea getImmutableBiomeCopy() {
         return ByteArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, getBiomeMin(), getBiomeMax(), getBiomeSize()),
-            getBiomeMin(), getBiomeSize());
+                getBiomeMin(), getBiomeSize());
     }
 
     @Override
@@ -122,7 +122,7 @@ public interface DefaultedExtent extends Extent {
         switch (type) {
             case STANDARD:
                 return new CharArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, getBlockMin(), getBlockMax(), getBlockSize()),
-                    getBlockMin(), getBlockSize());
+                        getBlockMin(), getBlockSize());
             case THREAD_SAFE:
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -132,7 +132,7 @@ public interface DefaultedExtent extends Extent {
     @Override
     default ImmutableBlockVolume getImmutableBlockCopy() {
         return CharArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, getBlockMin(), getBlockMax(), getBlockSize()),
-            getBlockMin(), getBlockSize());
+                getBlockMin(), getBlockSize());
     }
 
     @Override
@@ -144,17 +144,29 @@ public interface DefaultedExtent extends Extent {
     default MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
         return new SpongeMutableBlockVolumeWorker<>(this);
     }
-    
+
     @Override
-    default ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin, boolean storeEntities) {
-        SpongeArchetypeVolume volume = new SpongeArchetypeVolume(GlobalPalette.instance, min.sub(origin), max.sub(origin));
+    default ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin) {
         Extent area = getExtentView(min, max);
+        BimapPalette palette = new BimapPalette();
+        area.getBlockWorker().iterate((v, x, y, z) -> {
+            palette.getOrAssign(v.getBlock(x, y, z));
+        });
         int ox = origin.getX();
         int oy = origin.getY();
         int oz = origin.getZ();
-        area.getBlockWorker().map((extent, x, y, z) -> {
-            return extent.getBlock(x + ox, y + oy, z + oz);
-        }, volume);
+        final MutableBlockVolume backing;
+        if (palette.getHighestId() <= 0xFF) {
+            backing = new ByteArrayMutableBlockBuffer(palette, min.sub(origin), max.sub(min).add(1, 1, 1));
+        } else if (palette.getHighestId() <= 0xFFFF) {
+            backing = new CharArrayMutableBlockBuffer(palette, min.sub(origin), max.sub(min).add(1, 1, 1));
+        } else {
+            backing = new IntArrayMutableBlockBuffer(palette, min.sub(origin), max.sub(min).add(1, 1, 1));
+        }
+        area.getBlockWorker().iterate((extent, x, y, z) -> {
+            backing.setBlock(x - ox, y - oy, z - oz, extent.getBlock(x, y, z));
+        });
+        SpongeArchetypeVolume volume = new SpongeArchetypeVolume(backing);
         // TODO create tile entity / entity archetypes
         return volume;
     }

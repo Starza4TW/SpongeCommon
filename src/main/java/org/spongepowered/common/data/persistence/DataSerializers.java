@@ -1004,7 +1004,6 @@ public final class DataSerializers {
         dataManager.registerTranslator(LocalDate.class, LOCAL_DATE_DATA_SERIALIZER);
         dataManager.registerTranslator(LocalDateTime.class, LOCAL_DATE_TIME_DATA_SERIALIZER);
         dataManager.registerTranslator(ZonedDateTime.class, ZONED_DATE_TIME_DATA_SERIALIZER);
-        dataManager.registerTranslator(ConfigurationNode.class, ConfigurateTranslator.instance());
     }
 
 }

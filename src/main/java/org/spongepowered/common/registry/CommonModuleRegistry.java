@@ -37,6 +37,7 @@ import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.persistence.DataFormat;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.type.*;
 import org.spongepowered.api.effect.particle.*;
 import org.spongepowered.api.effect.potion.PotionEffect;
@@ -107,6 +108,8 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.gen.populator.*;
 import org.spongepowered.api.world.gen.type.BiomeTreeType;
 import org.spongepowered.api.world.gen.type.MushroomType;
+import org.spongepowered.api.world.schematic.PaletteType;
+import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.ban.SpongeBanBuilder;
@@ -140,6 +143,7 @@ import org.spongepowered.common.registry.type.block.*;
 import org.spongepowered.common.registry.type.boss.BossBarColorRegistryModule;
 import org.spongepowered.common.registry.type.boss.BossBarOverlayRegistryModule;
 import org.spongepowered.common.registry.type.data.DataFormatRegistryModule;
+import org.spongepowered.common.registry.type.data.DataTranslatorRegistryModule;
 import org.spongepowered.common.registry.type.data.HandTypeRegistryModule;
 import org.spongepowered.common.registry.type.economy.TransactionTypeRegistryModule;
 import org.spongepowered.common.registry.type.effect.ParticleRegistryModule;
@@ -170,6 +174,7 @@ import org.spongepowered.common.scoreboard.builder.SpongeScoreboardBuilder;
 import org.spongepowered.common.scoreboard.builder.SpongeTeamBuilder;
 import org.spongepowered.common.world.SpongeExplosionBuilder;
 import org.spongepowered.common.world.SpongeWorldArchetypeBuilder;
+import org.spongepowered.common.world.schematic.SpongeSchematicBuilder;
 import org.spongepowered.common.world.gen.builders.*;
 
 import java.lang.reflect.Field;
@@ -283,6 +288,7 @@ public final class CommonModuleRegistry {
             .registerBuilderSupplier(PortalTeleportCause.Builder.class, SpongePortalTeleportCauseBuilder::new)
             .registerBuilderSupplier(ServerBossBar.Builder.class, ServerBossBarBuilder::new)
             .registerBuilderSupplier(TileEntityArchetype.Builder.class, SpongeTileEntityArchetypeBuilder::new)
+            .registerBuilderSupplier(Schematic.Builder.class, SpongeSchematicBuilder::new)
         ;
     }
 
@@ -312,6 +318,7 @@ public final class CommonModuleRegistry {
             .registerModule(new DamageSourceRegistryModule())
             .registerModule(DamageType.class, new DamageTypeRegistryModule())
             .registerModule(DataFormat.class, new DataFormatRegistryModule())
+            .registerModule(DataTranslator.class, DataTranslatorRegistryModule.getInstance())
             .registerModule(Difficulty.class, new DifficultyRegistryModule())
             .registerModule(DimensionType.class, DimensionTypeRegistryModule.getInstance())
             .registerModule(DirtType.class, new DirtTypeRegistryModule())
@@ -384,6 +391,7 @@ public final class CommonModuleRegistry {
             .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
             .registerModule(PortalAgentType.class, PortalAgentRegistryModule.getInstance())
             .registerModule(HandType.class, HandTypeRegistryModule.getInstance())
+            .registerModule(PaletteType.class, new PaletteTypeRegistryModule())
             ;
     }
 

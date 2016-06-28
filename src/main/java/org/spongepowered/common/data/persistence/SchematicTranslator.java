@@ -87,13 +87,9 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
             throw new InvalidDataException("Schematic offset was not of length 3");
         }
         
-        int palette_max = view.getInt(DataQueries.Schematic.PALETTE_MAX).orElse(4);
+        int palette_max = view.getInt(DataQueries.Schematic.PALETTE_MAX).orElse(0xFFFF);
         
         Schematic schematic;
-        if(palette_max == 1) {
-            schematic = new ByteArray
-        }
-
         return null;
     }
 

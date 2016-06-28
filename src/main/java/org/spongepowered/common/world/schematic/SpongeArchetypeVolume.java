@@ -87,7 +87,10 @@ public class SpongeArchetypeVolume extends AbstractBlockBuffer implements Archet
 
     @Override
     public void apply(Location<World> location, Cause cause) {
-        // TODO apply
+        this.backing.getBlockWorker().iterate((v, x, y, z) -> {
+            location.getExtent().setBlock(x + location.getBlockX(), y + location.getBlockY(), z + location.getBlockZ(), v.getBlock(x, y, z), false,
+                    cause);
+        });
     }
 
     @Override

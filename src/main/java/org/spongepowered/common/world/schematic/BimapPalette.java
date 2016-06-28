@@ -73,6 +73,9 @@ public class BimapPalette implements Palette {
         Integer id = this.idsr.get(state);
         if (id == null) {
             int next = this.allocation.nextClearBit(0);
+            if (this.maxId < next) {
+                this.maxId = next;
+            }
             this.allocation.set(next);
             this.ids.put(next, state);
             return next;
@@ -92,6 +95,9 @@ public class BimapPalette implements Palette {
             return false;
         }
         this.allocation.clear(id);
+        if (id == this.maxId) {
+            this.maxId = this.allocation.previousSetBit(this.maxId);
+        }
         this.ids.remove(id);
         return true;
     }
