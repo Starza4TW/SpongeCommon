@@ -93,6 +93,7 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.world.Location;
@@ -211,7 +212,7 @@ public abstract class MixinEntity implements Entity, IMixinEntity {
     @Shadow public abstract String getCustomNameTag();
     @Shadow public abstract void setCustomNameTag(String name);
     @Shadow public abstract UUID getUniqueID();
-    @Shadow public abstract AxisAlignedBB getEntityBoundingBox();
+    @Shadow @Nullable public abstract AxisAlignedBB getEntityBoundingBox();
     @Shadow protected abstract boolean getAlwaysRenderNameTag();
     @Shadow protected abstract void setAlwaysRenderNameTag(boolean visible);
     @Shadow public abstract void setFire(int seconds);
@@ -667,6 +668,23 @@ public abstract class MixinEntity implements Entity, IMixinEntity {
         } else {
             // Let the entity tracker do its job, this just updates the variables
             shadow$setRotation((float) rotation.getY(), (float) rotation.getX());
+        }
+    }
+
+    @Override
+    public Optional<AABB> getBoundingBox() {
+        final AxisAlignedBB boundingBox = getEntityBoundingBox();
+        if (boundingBox == null) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(new AABB(
+                new Vector3d(boundingBox.minX, boundingBox.minY, boundingBox.minZ),
+                new Vector3d(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ))
+            );
+        } catch (IllegalArgumentException exception) {
+            // Bounding box is degenerate, the entity doesn't actually have one
+            return Optional.empty();
         }
     }
 
