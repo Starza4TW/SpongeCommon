@@ -27,11 +27,13 @@ package org.spongepowered.common.util;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Rotations;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec3i;
 import net.minecraft.world.ChunkCoordIntPair;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.world.Location;
 
 public final class VecHelper {
@@ -121,7 +123,25 @@ public final class VecHelper {
         return x >= min.getX() && x <= max.getX() && y >= min.getY() && y <= max.getY() && z >= min.getZ() && z <= max.getZ();
     }
 
+    public static boolean inBounds(Vector3d pos, Vector3i min, Vector3i max) {
+        return inBounds(pos.getX(), pos.getY(), pos.getZ(), min, max);
+    }
+
     public static boolean inBounds(double x, double y, double z, Vector3i min, Vector3i max) {
         return x >= min.getX() && x <= max.getX() && y >= min.getY() && y <= max.getY() && z >= min.getZ() && z <= max.getZ();
+    }
+
+    public static AxisAlignedBB toMC(AABB box) {
+        return new AxisAlignedBB(
+            box.getMin().getX(), box.getMin().getY(), box.getMin().getZ(),
+            box.getMax().getX(), box.getMax().getY(), box.getMax().getZ()
+        );
+    }
+
+    public static AABB toSponge(AxisAlignedBB box) {
+        return new AABB(
+            new Vector3d(box.minX, box.minY, box.minZ),
+            new Vector3d(box.maxX, box.maxY, box.maxZ)
+        );
     }
 }
