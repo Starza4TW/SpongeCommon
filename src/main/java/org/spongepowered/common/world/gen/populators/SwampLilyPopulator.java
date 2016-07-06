@@ -55,10 +55,10 @@ public class SwampLilyPopulator implements GenerationPopulator {
                     for (int i1 = 255; i1 >= 0; --i1) {
                         if (buffer.getBlock(x, i1, z).getType() != BlockTypes.AIR) {
                             if (i1 == 62 && buffer.getBlock(x, i1, z).getType() != BlockTypes.WATER) {
-                                buffer.setBlock(x, i1, z, BlockTypes.WATER.getDefaultState());
+                                buffer.setBlock(x, i1, z, BlockTypes.WATER.getDefaultState(), );
 
                                 if (d1 < 0.12D) {
-                                    buffer.setBlock(x, i1 + 1, z, BlockTypes.WATERLILY.getDefaultState());
+                                    buffer.setBlock(x, i1 + 1, z, BlockTypes.WATERLILY.getDefaultState(), );
                                 }
                             }
                             break;

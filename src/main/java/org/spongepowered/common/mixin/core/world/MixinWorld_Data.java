@@ -214,7 +214,7 @@ public abstract class MixinWorld_Data implements World {
         final BlockState blockState = getBlock(x, y, z).withExtendedProperties(new Location<>(this, x, y, z));
         if (blockState.supports(key)) {
             ImmutableValue<E> old = ((Value<E>) getValue(x, y, z, (Key) key).get()).asImmutable();
-            setBlock(x, y, z, blockState.with(key, value).get());
+            setBlock(x, y, z, blockState.with(key, value).get(), );
             ImmutableValue<E> newVal = ((Value<E>) getValue(x, y, z, (Key) key).get()).asImmutable();
             return DataTransactionResult.successReplaceResult(newVal, old);
         }
@@ -234,7 +234,7 @@ public abstract class MixinWorld_Data implements World {
             final List<ImmutableValue<?>> old = new ArrayList<>(blockState.getValues());
             final BlockState newState = blockState.with(immutableDataManipulator).get();
             old.removeAll(newState.getValues());
-            setBlock(x, y, z, newState);
+            setBlock(x, y, z, newState, );
             return DataTransactionResult.successReplaceResult(old, manipulator.getValues());
         } else {
             final Optional<TileEntity> tileEntityOptional = getTileEntity(x, y, z);

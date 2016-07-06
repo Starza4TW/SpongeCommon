@@ -57,7 +57,6 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameRules;
@@ -92,6 +91,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
@@ -143,7 +143,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -327,8 +326,8 @@ public abstract class MixinWorld implements World, IMixinWorld {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        setBlock(x, y, z, block, true);
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+        return setBlock(x, y, z, block, true, cause);
     }
 
 
@@ -359,10 +358,11 @@ public abstract class MixinWorld implements World, IMixinWorld {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
+    public Optional<Entity> createEntity(EntityType type, Vector3d position, Cause cause) {
         checkNotNull(type, "The entity type cannot be null!");
         checkNotNull(position, "The position cannot be null!");
-
+        cause.get(NamedCause.PLUGIN_CONTAINER, PluginContainer.class)
+                .orElseThrow(() -> new IllegalArgumentException("Expected to have a PluginContainer in the cause under NamedCause.PLUGIN_CONTAINER!"));
         Entity entity = null;
 
         Class<? extends Entity> entityClass = type.getEntityClass();
@@ -427,13 +427,13 @@ public abstract class MixinWorld implements World, IMixinWorld {
     }
 
     @Override
-    public Optional<Entity> createEntity(DataContainer entityContainer) {
+    public Optional<Entity> createEntity(DataContainer entityContainer, Cause cause) {
         // TODO once entity containers are implemented
         return Optional.empty();
     }
 
     @Override
-    public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
+    public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position, Cause cause) {
         // TODO once entity containers are implemented
         return Optional.empty();
     }

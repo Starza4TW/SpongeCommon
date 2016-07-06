@@ -234,7 +234,7 @@ public class ProjectileLauncher {
         if (!opType.isPresent()) {
             return Optional.empty();
         }
-        Optional<Entity> projectile = loc.getExtent().createEntity(opType.get(), loc.getPosition());
+        Optional<Entity> projectile = loc.getExtent().createEntity(opType.get(), loc.getPosition(), );
         if (!projectile.isPresent()) {
             return Optional.empty();
         }

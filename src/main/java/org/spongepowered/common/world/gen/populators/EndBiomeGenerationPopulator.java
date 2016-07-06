@@ -44,7 +44,7 @@ public class EndBiomeGenerationPopulator implements GenerationPopulator {
                 for (int y = max.getY(); y >= min.getY(); --y) {
                     BlockState iblockstate2 = buffer.getBlock(x, y, z);
                     if (iblockstate2.getType() == BlockTypes.STONE) {
-                        buffer.setBlock(x, y, z, iblockstate);
+                        buffer.setBlock(x, y, z, iblockstate, );
                     }
                 }
             }

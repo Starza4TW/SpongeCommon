@@ -180,9 +180,9 @@ public class ExtentViewTransform implements DefaultedExtent {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
         this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-            .transformZ(x, y, z), block);
+            .transformZ(x, y, z), block, );
     }
 
     @Override
@@ -470,19 +470,19 @@ public class ExtentViewTransform implements DefaultedExtent {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
-        return this.extent.createEntity(type, inverseTransform(position));
+    public Optional<Entity> createEntity(EntityType type, Vector3d position, Cause cause) {
+        return this.extent.createEntity(type, inverseTransform(position), );
     }
 
     @Override
-    public Optional<Entity> createEntity(DataContainer entityContainer) {
+    public Optional<Entity> createEntity(DataContainer entityContainer, Cause cause) {
         // TODO once entity containers are implemented
         return Optional.empty();
     }
 
     @Override
-    public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
-        return this.extent.createEntity(entityContainer, inverseTransform(position));
+    public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position, Cause cause) {
+        return this.extent.createEntity(entityContainer, inverseTransform(position), );
     }
 
     @Override

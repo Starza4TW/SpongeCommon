@@ -183,9 +183,9 @@ public class ExtentViewDownsize implements DefaultedExtent {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
         checkRange(x, y, z);
-        this.extent.setBlock(x, y, z, block);
+        this.extent.setBlock(x, y, z, block, );
     }
 
     @Override
@@ -455,22 +455,22 @@ public class ExtentViewDownsize implements DefaultedExtent {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
+    public Optional<Entity> createEntity(EntityType type, Vector3d position, Cause cause) {
         checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.createEntity(type, position);
+        return this.extent.createEntity(type, position, );
     }
 
     @Override
-    public Optional<Entity> createEntity(DataContainer entityContainer) {
+    public Optional<Entity> createEntity(DataContainer entityContainer, Cause cause) {
         // TODO once entity containers are implemented
         //checkRange(position.getX(), position.getY(), position.getZ());
         return Optional.empty();
     }
 
     @Override
-    public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
+    public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position, Cause cause) {
         checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.createEntity(entityContainer, position);
+        return this.extent.createEntity(entityContainer, position, );
     }
 
     @Override

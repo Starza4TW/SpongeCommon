@@ -204,7 +204,7 @@ public abstract class MixinChunkProviderOverworld implements IChunkProvider, Gen
                 for (int y = 0; y < 6; y++) {
                     int y0 = min.getY() + y;
                     if (y <= this.rand.nextInt(5)) {
-                        buffer.setBlock(x0, y0, z0, BlockTypes.BEDROCK.getDefaultState());
+                        buffer.setBlock(x0, y0, z0, BlockTypes.BEDROCK.getDefaultState(), );
                     }
                 }
             }

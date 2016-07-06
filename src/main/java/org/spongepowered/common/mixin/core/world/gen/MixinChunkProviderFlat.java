@@ -125,7 +125,7 @@ public class MixinChunkProviderFlat implements GenerationPopulator, IPopulatorPr
                 for (x = 0; x < 16; ++x) {
                     int x0 = min.getX() + x;
                     for (z = 0; z < 16; ++z) {
-                        buffer.setBlock(x0, y0, min.getZ() + z, (BlockState) iblockstate);
+                        buffer.setBlock(x0, y0, min.getZ() + z, (BlockState) iblockstate, );
                     }
                 }
             }

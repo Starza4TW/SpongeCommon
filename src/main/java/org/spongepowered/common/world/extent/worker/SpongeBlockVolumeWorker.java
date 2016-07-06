@@ -28,7 +28,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -62,7 +64,9 @@ public class SpongeBlockVolumeWorker<V extends BlockVolume> implements BlockVolu
     }
 
     @Override
-    public void map(BlockVolumeMapper mapper, MutableBlockVolume destination) {
+    public void map(BlockVolumeMapper mapper, MutableBlockVolume destination, Cause cause) {
+        cause.get(NamedCause.PLUGIN_CONTAINER, PluginContainer.class)
+                .orElseThrow(() -> new IllegalArgumentException("Expected to have a PluginContainer in the cause under NamedCause.PLUGIN_CONTAINER!"));
         final Vector3i offset = align(destination);
         final int xOffset = offset.getX();
         final int yOffset = offset.getY();
@@ -94,7 +98,7 @@ public class SpongeBlockVolumeWorker<V extends BlockVolume> implements BlockVolu
                 for (int x = xMin; x <= xMax; x++) {
                     final BlockState block = mapper.map(unmodifiableVolume, x, y, z);
 
-                    destination.setBlock(x + xOffset, y + yOffset, z + zOffset, block);
+                    destination.setBlock(x + xOffset, y + yOffset, z + zOffset, block, cause);
                 }
             }
         }
@@ -105,8 +109,9 @@ public class SpongeBlockVolumeWorker<V extends BlockVolume> implements BlockVolu
     }
 
     @Override
-    public void merge(BlockVolume second, BlockVolumeMerger merger, MutableBlockVolume destination) {
-        final Vector3i offsetSecond = align(second);
+    public void merge(BlockVolume second, BlockVolumeMerger merger, MutableBlockVolume destination, Cause cause) {
+        cause.get(NamedCause.PLUGIN_CONTAINER, PluginContainer.class)
+                .orElseThrow(() -> new IllegalArgumentException("Expected to have a PluginContainer in the cause under NamedCause.PLUGIN_CONTAINER!")); final Vector3i offsetSecond = align(second);
         final int xOffsetSecond = offsetSecond.getX();
         final int yOffsetSecond = offsetSecond.getY();
         final int zOffsetSecond = offsetSecond.getZ();
@@ -135,7 +140,7 @@ public class SpongeBlockVolumeWorker<V extends BlockVolume> implements BlockVolu
                 for (int x = xMin; x <= xMax; x++) {
                     final BlockState block = merger.merge(firstUnmodifiableVolume, x, y, z,
                         secondUnmodifiableVolume, x + xOffsetSecond, y + yOffsetSecond, z + zOffsetSecond);
-                    destination.setBlock(x + xOffsetDestination, y + yOffsetDestination, z + zOffsetDestination, block);
+                    destination.setBlock(x + xOffsetDestination, y + yOffsetDestination, z + zOffsetDestination, block, cause);
                 }
             }
         }

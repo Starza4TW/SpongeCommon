@@ -124,7 +124,7 @@ public class SpongeGenerationPopulator implements GenerationPopulator, IGenerati
                 for (int yInChunk = yInChunkStart; yInChunk <= yInChunkEnd; yInChunk++) {
                     for (int zInChunk = zInChunkStart; zInChunk <= zInChunkEnd; zInChunk++) {
                         buffer.setBlock(xOffset + xInChunk, yOffset + yInChunk, zOffset + zInChunk,
-                                (BlockState) miniChunk.get(xInChunk, yInChunk, zInChunk));
+                                (BlockState) miniChunk.get(xInChunk, yInChunk, zInChunk), );
                     }
                 }
             }

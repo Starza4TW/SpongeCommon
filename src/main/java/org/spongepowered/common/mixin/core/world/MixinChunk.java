@@ -59,7 +59,6 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.entity.CollideEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
@@ -77,12 +76,10 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.block.BlockUtil;
 import org.spongepowered.common.entity.PlayerTracker;
-import org.spongepowered.common.event.InternalNamedCauses;
 import org.spongepowered.common.event.SpongeCommonEventFactory;
 import org.spongepowered.common.event.tracking.CauseTracker;
 import org.spongepowered.common.event.tracking.PhaseContext;
@@ -301,7 +298,7 @@ public abstract class MixinChunk implements Chunk, IMixinChunk {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
         checkBlockBounds(x, y, z);
         BlockUtil.setBlockState((net.minecraft.world.chunk.Chunk) (Object) this, x, y, z, block, false);
     }
@@ -659,18 +656,18 @@ public abstract class MixinChunk implements Chunk, IMixinChunk {
     // Continuing the rest of the implementation
 
     @Override
-    public Optional<org.spongepowered.api.entity.Entity> createEntity(EntityType type, Vector3d position) {
-        return this.world.createEntity(type, this.chunkPos.mul(16).toDouble().add(position.min(15, this.blockMax.getY(), 15)));
+    public Optional<org.spongepowered.api.entity.Entity> createEntity(EntityType type, Vector3d position, Cause cause) {
+        return this.world.createEntity(type, this.chunkPos.mul(16).toDouble().add(position.min(15, this.blockMax.getY(), 15)), );
     }
 
     @Override
-    public Optional<org.spongepowered.api.entity.Entity> createEntity(DataContainer entityContainer) {
-        return this.world.createEntity(entityContainer);
+    public Optional<org.spongepowered.api.entity.Entity> createEntity(DataContainer entityContainer, Cause cause) {
+        return this.world.createEntity(entityContainer, );
     }
 
     @Override
-    public Optional<org.spongepowered.api.entity.Entity> createEntity(DataContainer entityContainer, Vector3d position) {
-        return this.world.createEntity(entityContainer, this.chunkPos.mul(16).toDouble().add(position.min(15, this.blockMax.getY(), 15)));
+    public Optional<org.spongepowered.api.entity.Entity> createEntity(DataContainer entityContainer, Vector3d position, Cause cause) {
+        return this.world.createEntity(entityContainer, this.chunkPos.mul(16).toDouble().add(position.min(15, this.blockMax.getY(), 15)), );
     }
 
     @Override
