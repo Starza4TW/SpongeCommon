@@ -55,6 +55,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -196,15 +197,15 @@ public class ExtentViewTransform implements DefaultedExtent {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
+    public void setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag) {
         this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-            .transformZ(x, y, z), block, notifyNeighbors);
+            .transformZ(x, y, z), block, flag);
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
+    public void setBlock(int x, int y, int z, BlockState blockState, BlockChangeFlag flag, Cause cause) {
         checkArgument(cause.root() instanceof PluginContainer, "PluginContainer must be at the ROOT of a cause!");
-        this.extent.setBlock(x, y, z, blockState, notifyNeighbors, cause);
+        this.extent.setBlock(x, y, z, blockState, flag, cause);
     }
 
     @Override
@@ -215,19 +216,19 @@ public class ExtentViewTransform implements DefaultedExtent {
     }
 
     @Override
-    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
         final Vector3i position = snapshot.getPosition();
         final int x = position.getX();
         final int y = position.getY();
         final int z = position.getZ();
         return this.extent.restoreSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), snapshot, force, notifyNeighbors);
+            this.inverseTransform.transformZ(x, y, z), snapshot, force, flag);
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, BlockChangeFlag flag) {
         return this.extent.restoreSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), snapshot, force, notifyNeighbors);
+            this.inverseTransform.transformZ(x, y, z), snapshot, force, flag);
     }
 
     @Override
