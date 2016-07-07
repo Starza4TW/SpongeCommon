@@ -35,6 +35,7 @@ import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.schematic.Palette;
+import org.spongepowered.api.world.schematic.PaletteTypes;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.common.data.util.DataQueries;
 import org.spongepowered.common.util.gen.ByteArrayMutableBlockBuffer;
@@ -44,6 +45,7 @@ import org.spongepowered.common.world.schematic.BimapPalette;
 import org.spongepowered.common.world.schematic.GlobalPalette;
 import org.spongepowered.common.world.schematic.SpongeSchematic;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Optional;
 import java.util.Set;
 
@@ -91,8 +93,8 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
         int height = view.getShort(DataQueries.Schematic.HEIGHT).get();
         int length = view.getShort(DataQueries.Schematic.LENGTH).get();
         if (width > MAX_SIZE || height > MAX_SIZE || length > MAX_SIZE) {
-            throw new InvalidDataException(String.format(
-                    "Schematic is larger than maximum allowable size (found: (%d, %d, %d) max: (%d, %<d, %<d)", width, height, length, MAX_SIZE));
+            throw new InvalidDataException(String.format("Schematic is larger than maximum allowable size (found: (%d, %d, %d) max: (%d, %<d, %<d)",
+                    width, height, length, MAX_SIZE));
         }
 
         int[] offset = (int[]) view.get(DataQueries.Schematic.OFFSET).orElse(null);
@@ -129,21 +131,21 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
         }
 
         byte[] blockdata = (byte[]) view.get(DataQueries.Schematic.BLOCK_DATA).get();
-
         int index = 0;
         int i = 0;
         int value = 0;
         int varint_length = 0;
         while (i < blockdata.length) {
             value = 0;
-            length = 0;
+            varint_length = 0;
 
             while (true) {
-                value |= (blockdata[i] & 127) << varint_length++ * 7;
+                value |= (blockdata[i] & 127) << (varint_length++ * 7);
                 if (varint_length > 5) {
                     throw new RuntimeException("VarInt too big (probably corrupted data)");
                 }
                 if ((blockdata[i] & 128) != 128) {
+                    i++;
                     break;
                 }
                 i++;
@@ -152,7 +154,6 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
             int y = index / (width * length);
             int z = (index % (width * length)) / width;
             int x = (index % (width * length)) % width;
-
             BlockState state = palette.get(value).get();
             buffer.setBlock(x - offset[0], y - offset[1], z - offset[2], state);
 
@@ -165,10 +166,64 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
     }
 
     @Override
-    public DataContainer translate(Schematic obj) throws InvalidDataException {
+    public DataContainer translate(Schematic schematic) throws InvalidDataException {
         DataContainer data = new NonCloningDataContainer();
-        // TODO Auto-generated method stub
-        return null;
+        final int xMin = schematic.getBlockMin().getX();
+        final int yMin = schematic.getBlockMin().getY();
+        final int zMin = schematic.getBlockMin().getZ();
+        final int width = schematic.getBlockSize().getX();
+        final int height = schematic.getBlockSize().getY();
+        final int length = schematic.getBlockSize().getZ();
+        if (width > MAX_SIZE || height > MAX_SIZE || length > MAX_SIZE) {
+            throw new IllegalArgumentException(String.format(
+                    "Schematic is larger than maximum allowable size (found: (%d, %d, %d) max: (%d, %<d, %<d)", width, height, length, MAX_SIZE));
+        }
+        data.set(DataQueries.Schematic.WIDTH, width);
+        data.set(DataQueries.Schematic.HEIGHT, height);
+        data.set(DataQueries.Schematic.LENGTH, length);
+
+        data.set(DataQueries.Schematic.VERSION, VERSION);
+        for (DataQuery metaKey : schematic.getMetadata().getKeys(false)) {
+            data.set(DataQueries.Schematic.METADATA.then(metaKey), schematic.getMetadata().get(metaKey).get());
+        }
+
+        int[] offset = new int[] {-xMin, -yMin, -zMin};
+        data.set(DataQueries.Schematic.OFFSET, offset);
+
+        Palette palette = schematic.getPalette();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream(width * height * length);
+
+        for (int y = 0; y < height; y++) {
+            int y0 = yMin + y;
+            for (int z = 0; z < length; z++) {
+                int z0 = zMin + z;
+                for (int x = 0; x < width; x++) {
+                    int x0 = xMin + x;
+                    BlockState state = schematic.getBlock(x0, y0, z0);
+                    int id = palette.getOrAssign(state);
+
+                    while ((id & -128) != 0) {
+                        buffer.write(id & 127 | 128);
+                        id >>>= 7;
+                    }
+                    buffer.write(id);
+                }
+            }
+        }
+
+        data.set(DataQueries.Schematic.BLOCK_DATA, buffer.toByteArray());
+
+        if (palette.getType() == PaletteTypes.LOCAL) {
+            DataQuery paletteQuery = DataQueries.Schematic.PALETTE;
+            for (BlockState state : palette.getEntries()) {
+                // getOrAssign to skip the optional, it will never assign
+                data.set(paletteQuery.then(state.getId()), palette.getOrAssign(state));
+            }
+            data.set(DataQueries.Schematic.PALETTE_MAX, palette.getHighestId());
+        }
+        // TODO tile entities and entities
+
+        return data;
     }
 
 }

@@ -65,7 +65,6 @@ public class NbtDataFormat extends SpongeCatalogType implements DataFormat {
     @SuppressWarnings("resource")
     public void writeTo(OutputStream output, DataView data) throws IOException {
         NBTTagCompound tag = NbtTranslator.getInstance().translateData(data);
-        System.out.println(tag);
         DataOutputStream dos;
         if (output instanceof DataOutputStream) {
             dos = (DataOutputStream) output;

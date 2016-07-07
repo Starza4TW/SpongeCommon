@@ -32,6 +32,7 @@ import org.spongepowered.api.world.schematic.PaletteType;
 import org.spongepowered.api.world.schematic.PaletteTypes;
 
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Optional;
 
 public class BimapPalette implements Palette {
@@ -108,6 +109,11 @@ public class BimapPalette implements Palette {
         }
         this.ids.remove(id);
         return true;
+    }
+
+    @Override
+    public Collection<BlockState> getEntries() {
+        return this.idsr.keySet();
     }
 
 }

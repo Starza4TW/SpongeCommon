@@ -153,7 +153,6 @@ public class NonCloningDataView implements DataView {
     @Override
     public Optional<Object> get(DataQuery path) {
         checkNotNull(path, "path");
-        // TODO why get as query parts? we only use them as strings except the first anyway
         List<String> queryParts = path.getParts();
 
         int sz = queryParts.size();
@@ -372,7 +371,6 @@ public class NonCloningDataView implements DataView {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public DataView createView(DataQuery path, Map<?, ?> map) {
         checkNotNull(path, "path");
         DataView section = createView(path);
@@ -393,7 +391,6 @@ public class NonCloningDataView implements DataView {
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Optional<? extends Map<?, ?>> getMap(DataQuery path) {
         Optional<Object> val = get(path);
         if (val.isPresent()) {
@@ -417,9 +414,8 @@ public class NonCloningDataView implements DataView {
                 builder.put(entry.getKey().asString('.'), viewsToMap(entry.getValue()));
             }
             return builder.build();
-        } else {
-            return object;
         }
+        return object;
     }
 
     private Optional<DataView> getUnsafeView(String path) {

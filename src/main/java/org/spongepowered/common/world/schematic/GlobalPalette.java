@@ -32,6 +32,7 @@ import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.PaletteType;
 import org.spongepowered.api.world.schematic.PaletteTypes;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public class GlobalPalette implements Palette {
@@ -49,7 +50,6 @@ public class GlobalPalette implements Palette {
     public PaletteType getType() {
         return PaletteTypes.GLOBAL;
     }
-
 
     @Override
     public int getHighestId() {
@@ -73,8 +73,12 @@ public class GlobalPalette implements Palette {
 
     @Override
     public boolean remove(BlockState state) {
-        // Unsupported
-        return false;
+        throw new UnsupportedOperationException("Cannot remove blockstates from the global palette");
+    }
+
+    @Override
+    public Collection<BlockState> getEntries() {
+        return Sponge.getRegistry().getAllOf(BlockState.class);
     }
 
 }
