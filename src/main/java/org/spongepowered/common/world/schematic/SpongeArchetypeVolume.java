@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.world.schematic;
 
+import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.entity.EntityArchetype;
@@ -44,20 +44,20 @@ import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.common.util.gen.AbstractBlockBuffer;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class SpongeArchetypeVolume extends AbstractBlockBuffer implements ArchetypeVolume {
 
     private final MutableBlockVolume backing;
-    private final Map<Vector3i, TileEntityArchetype> tiles = Maps.newHashMap();
-    private final List<EntityArchetype> entities = Lists.newArrayList();
+    private final Map<Vector3i, TileEntityArchetype> tiles;
+    private final Map<Vector3f, EntityArchetype> entities;
 
-    public SpongeArchetypeVolume(MutableBlockVolume backing) {
+    public SpongeArchetypeVolume(MutableBlockVolume backing, Map<Vector3i, TileEntityArchetype> tiles, Map<Vector3f, EntityArchetype> entities) {
         super(backing.getBlockMin(), backing.getBlockSize());
         this.backing = backing;
+        this.tiles = ImmutableMap.copyOf(tiles);
+        this.entities = ImmutableMap.copyOf(entities);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class SpongeArchetypeVolume extends AbstractBlockBuffer implements Archet
     }
 
     @Override
-    public Collection<EntityArchetype> getEntityArchetypes() {
+    public Map<Vector3f, EntityArchetype> getEntityArchetypes() {
         return this.entities;
     }
 
@@ -91,6 +91,7 @@ public class SpongeArchetypeVolume extends AbstractBlockBuffer implements Archet
             location.getExtent().setBlock(x + location.getBlockX(), y + location.getBlockY(), z + location.getBlockZ(), v.getBlock(x, y, z), false,
                     cause);
         });
+        // TODO apply entities and tile entities
     }
 
     @Override

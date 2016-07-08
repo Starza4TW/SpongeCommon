@@ -25,7 +25,11 @@
 package org.spongepowered.common.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Maps;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
+import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
@@ -50,6 +54,8 @@ import org.spongepowered.common.world.extent.worker.SpongeMutableBiomeAreaWorker
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
 import org.spongepowered.common.world.schematic.BimapPalette;
 import org.spongepowered.common.world.schematic.SpongeArchetypeVolume;
+
+import java.util.Map;
 
 /**
  * The Extent interface with extra defaults that are only available in the
@@ -163,10 +169,13 @@ public interface DefaultedExtent extends Extent {
         } else {
             backing = new IntArrayMutableBlockBuffer(palette, min.sub(origin), max.sub(min).add(1, 1, 1));
         }
+        Map<Vector3i, TileEntityArchetype> tiles = Maps.newHashMap();
+        Map<Vector3f, EntityArchetype> entities = Maps.newHashMap();
+        // TODO populate these maps
         area.getBlockWorker().iterate((extent, x, y, z) -> {
             backing.setBlock(x - ox, y - oy, z - oz, extent.getBlock(x, y, z));
         });
-        SpongeArchetypeVolume volume = new SpongeArchetypeVolume(backing);
+        SpongeArchetypeVolume volume = new SpongeArchetypeVolume(backing, tiles, entities);
         // TODO create tile entity / entity archetypes
         return volume;
     }

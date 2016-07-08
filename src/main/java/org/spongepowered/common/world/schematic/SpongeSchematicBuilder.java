@@ -6,11 +6,14 @@ package org.spongepowered.common.world.schematic;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -124,22 +127,25 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
         } else {
             volume = new IntArrayMutableBlockBuffer(this.palette, min, size);
         }
+        Map<Vector3i, TileEntityArchetype> tiles = Maps.newHashMap();
+        Map<Vector3f, EntityArchetype> entities = Maps.newHashMap();
+        // TODO populate these maps
         if (this.volume != null) {
-            this.volume.getBlockWorker().iterate((v, x, y, z)->{
+            this.volume.getBlockWorker().iterate((v, x, y, z) -> {
                 volume.setBlock(x, y, z, v.getBlock(x, y, z));
             });
         } else {
-            this.view.getBlockWorker().iterate((v, x, y, z)->{
+            this.view.getBlockWorker().iterate((v, x, y, z) -> {
                 volume.setBlock(x, y, z, v.getBlock(x, y, z));
             });
         }
-        if(this.metadata == null) {
+        if (this.metadata == null) {
             this.metadata = new MemoryDataContainer();
         }
-        for(Map.Entry<String, Object> entry: this.metaValues.entrySet()) {
+        for (Map.Entry<String, Object> entry : this.metaValues.entrySet()) {
             this.metadata.set(DataQuery.of(".", entry.getKey()), entry.getValue());
         }
-        SpongeSchematic schematic = new SpongeSchematic(volume, this.metadata);
+        SpongeSchematic schematic = new SpongeSchematic(volume, tiles, entities, this.metadata);
         return schematic;
     }
 

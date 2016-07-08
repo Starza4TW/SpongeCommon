@@ -24,15 +24,19 @@
  */
 package org.spongepowered.common.data.persistence;
 
+import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.schematic.Palette;
 import org.spongepowered.api.world.schematic.PaletteTypes;
@@ -46,6 +50,7 @@ import org.spongepowered.common.world.schematic.GlobalPalette;
 import org.spongepowered.common.world.schematic.SpongeSchematic;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -159,9 +164,11 @@ public class SchematicTranslator implements DataTranslator<Schematic> {
 
             index++;
         }
+        Map<Vector3i, TileEntityArchetype> tiles = Maps.newHashMap();
+        Map<Vector3f, EntityArchetype> entities = Maps.newHashMap();
         // TODO tile entities and entities
 
-        Schematic schematic = new SpongeSchematic(buffer, metadata);
+        Schematic schematic = new SpongeSchematic(buffer, tiles, entities, metadata);
         return schematic;
     }
 

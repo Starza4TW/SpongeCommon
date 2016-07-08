@@ -41,7 +41,6 @@ import com.flowpowered.math.vector.Vector4f;
 import com.flowpowered.math.vector.Vector4i;
 import com.flowpowered.math.vector.Vector4l;
 import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataQuery;

@@ -24,25 +24,31 @@
  */
 package org.spongepowered.common.world.schematic;
 
-import org.spongepowered.api.data.DataContainer;
+import com.flowpowered.math.vector.Vector3f;
+import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.schematic.Schematic;
 import org.spongepowered.common.world.extent.worker.SpongeMutableBlockVolumeWorker;
 
+import java.util.Map;
+
 public class SpongeSchematic extends SpongeArchetypeVolume implements Schematic {
 
     private DataView metadata;
 
-    public SpongeSchematic(MutableBlockVolume backing) {
-        super(backing);
+    public SpongeSchematic(MutableBlockVolume backing, Map<Vector3i, TileEntityArchetype> tiles, Map<Vector3f, EntityArchetype> entities) {
+        super(backing, tiles, entities);
         this.metadata = new MemoryDataContainer();
     }
 
-    public SpongeSchematic(MutableBlockVolume backing, DataView metadata) {
-        super(backing);
+    public SpongeSchematic(MutableBlockVolume backing, Map<Vector3i, TileEntityArchetype> tiles, Map<Vector3f, EntityArchetype> entities,
+            DataView metadata) {
+        super(backing, tiles, entities);
         this.metadata = metadata;
     }
 
