@@ -34,6 +34,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -55,6 +56,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.common.SpongeImpl;
+import org.spongepowered.common.block.SpongeTileEntityArchetypeBuilder;
 import org.spongepowered.common.data.persistence.NbtTranslator;
 import org.spongepowered.common.data.type.SpongeTileEntityType;
 import org.spongepowered.common.data.util.DataQueries;
@@ -280,5 +282,10 @@ public abstract class MixinTileEntity implements TileEntity, IMixinTileEntity {
             this.timing = SpongeTimings.getTileEntityTiming((org.spongepowered.api.block.tileentity.TileEntity) (Object) this);
         }
         return this.timing;
+    }
+    
+    @Override
+    public  TileEntityArchetype createArchetype() {
+        return new SpongeTileEntityArchetypeBuilder().tile(this).build();
     }
 }
