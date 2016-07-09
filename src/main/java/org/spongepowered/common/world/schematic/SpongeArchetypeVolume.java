@@ -66,12 +66,12 @@ public class SpongeArchetypeVolume extends AbstractBlockBuffer implements Archet
     }
 
     @Override
-    public Optional<TileEntityArchetype> getBlockArchetype(int x, int y, int z) {
+    public Optional<TileEntityArchetype> getTileEntityArchetype(int x, int y, int z) {
         return Optional.ofNullable(this.tiles.get(getBlockMin().add(x, y, z)));
     }
 
     @Override
-    public Map<Vector3i, TileEntityArchetype> getBlockArchetypes() {
+    public Map<Vector3i, TileEntityArchetype> getTileEntityArchetypes() {
         return this.tiles;
     }
 
@@ -91,7 +91,11 @@ public class SpongeArchetypeVolume extends AbstractBlockBuffer implements Archet
             location.getExtent().setBlock(x + location.getBlockX(), y + location.getBlockY(), z + location.getBlockZ(), v.getBlock(x, y, z), false,
                     cause);
         });
-        // TODO apply entities and tile entities
+        for (Vector3i pos : this.tiles.keySet()) {
+            TileEntityArchetype archetype = this.tiles.get(pos);
+            archetype.apply(location.add(pos), cause);
+        }
+        // TODO apply entities
     }
 
     @Override
@@ -127,6 +131,10 @@ public class SpongeArchetypeVolume extends AbstractBlockBuffer implements Archet
     @Override
     public ImmutableBlockVolume getImmutableBlockCopy() {
         return this.backing.getImmutableBlockCopy();
+    }
+
+    public MutableBlockVolume getBacking() {
+        return this.backing;
     }
 
 }

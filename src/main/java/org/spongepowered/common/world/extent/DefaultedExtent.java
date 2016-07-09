@@ -28,6 +28,8 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.util.DiscreteTransform2;
@@ -56,6 +58,7 @@ import org.spongepowered.common.world.schematic.BimapPalette;
 import org.spongepowered.common.world.schematic.SpongeArchetypeVolume;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The Extent interface with extra defaults that are only available in the
@@ -173,10 +176,15 @@ public interface DefaultedExtent extends Extent {
         Map<Vector3f, EntityArchetype> entities = Maps.newHashMap();
         // TODO populate these maps
         area.getBlockWorker().iterate((extent, x, y, z) -> {
-            backing.setBlock(x - ox, y - oy, z - oz, extent.getBlock(x, y, z));
+            BlockState state = extent.getBlock(x, y, z);
+            backing.setBlock(x - ox, y - oy, z - oz, state);
+            Optional<TileEntity> tile = extent.getTileEntity(x, y, z);
+            if (tile.isPresent()) {
+                tiles.put(new Vector3i(x - ox, y - oy, z - oz), tile.get().createArchetype());
+            }
         });
         SpongeArchetypeVolume volume = new SpongeArchetypeVolume(backing, tiles, entities);
-        // TODO create tile entity / entity archetypes
+        // TODO create entity archetypes
         return volume;
     }
 

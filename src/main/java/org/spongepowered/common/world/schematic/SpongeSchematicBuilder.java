@@ -105,9 +105,6 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
     public Schematic build() throws IllegalArgumentException {
         if (this.palette == null) {
             this.palette = this.type.create();
-            if (this.type == PaletteTypes.LOCAL) {
-                // TODO fill palette from area;
-            }
         }
         checkArgument(this.volume != null || this.view != null);
         Vector3i min;
@@ -119,34 +116,29 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
             min = this.view.getBlockMin();
             size = this.view.getBlockSize();
         }
-        final MutableBlockVolume volume;
-        if (this.palette.getHighestId() <= 0xFF) {
-            volume = new ByteArrayMutableBlockBuffer(this.palette, min, size);
-        } else if (this.palette.getHighestId() <= 0xFF) {
-            volume = new CharArrayMutableBlockBuffer(this.palette, min, size);
-        } else {
-            volume = new IntArrayMutableBlockBuffer(this.palette, min, size);
-        }
-        Map<Vector3i, TileEntityArchetype> tiles = Maps.newHashMap();
-        Map<Vector3f, EntityArchetype> entities = Maps.newHashMap();
-        // TODO populate these maps
-        if (this.volume != null) {
-            this.volume.getBlockWorker().iterate((v, x, y, z) -> {
-                volume.setBlock(x, y, z, v.getBlock(x, y, z));
-            });
-        } else {
-            this.view.getBlockWorker().iterate((v, x, y, z) -> {
-                volume.setBlock(x, y, z, v.getBlock(x, y, z));
-            });
-        }
+        Map<Vector3i, TileEntityArchetype> tiles = this.volume.getTileEntityArchetypes();
+        Map<Vector3f, EntityArchetype> entities = this.volume.getEntityArchetypes();
         if (this.metadata == null) {
             this.metadata = new MemoryDataContainer();
         }
         for (Map.Entry<String, Object> entry : this.metaValues.entrySet()) {
             this.metadata.set(DataQuery.of(".", entry.getKey()), entry.getValue());
         }
-        SpongeSchematic schematic = new SpongeSchematic(volume, tiles, entities, this.metadata);
-        return schematic;
+        if (this.volume == null) {
+            final MutableBlockVolume volume;
+            if (this.palette.getHighestId() <= 0xFF) {
+                volume = new ByteArrayMutableBlockBuffer(this.palette, min, size);
+            } else if (this.palette.getHighestId() <= 0xFF) {
+                volume = new CharArrayMutableBlockBuffer(this.palette, min, size);
+            } else {
+                volume = new IntArrayMutableBlockBuffer(this.palette, min, size);
+            }
+            this.view.getBlockWorker().iterate((v, x, y, z) -> {
+                volume.setBlock(x, y, z, v.getBlock(x, y, z));
+            });
+            return new SpongeSchematic(volume, tiles, entities, this.metadata);
+        }
+        return new SpongeSchematic((SpongeArchetypeVolume) this.volume, this.metadata);
     }
 
 }

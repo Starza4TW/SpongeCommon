@@ -229,6 +229,8 @@ public final class DataQueries {
         public static final DataQuery LEGACY_BLOCKS = of("Blocks");
         public static final DataQuery LEGACY_BLOCK_DATA = of("Data");
         public static final DataQuery LEGACY_ADD_BLOCKS = of("AddBlocks");
+
+        public static final DataQuery LEGACY_TILEDATA = of("TileEntities");
         
         private Schematic() {
         }

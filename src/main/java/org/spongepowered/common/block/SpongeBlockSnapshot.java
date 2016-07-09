@@ -38,6 +38,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
@@ -460,6 +461,11 @@ public class SpongeBlockSnapshot implements BlockSnapshot {
     @Override
     public Collection<Property<?, ?>> getApplicableProperties() {
         return this.blockState.getApplicableProperties();
+    }
+
+    @Override
+    public  TileEntityArchetype createArchetype() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

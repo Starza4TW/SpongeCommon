@@ -41,6 +41,12 @@ public class SpongeSchematic extends SpongeArchetypeVolume implements Schematic 
 
     private DataView metadata;
 
+    public SpongeSchematic(SpongeArchetypeVolume volume,
+            DataView metadata) {
+        super(volume.getBacking(), volume.getTileEntityArchetypes(), volume.getEntityArchetypes());
+        this.metadata = metadata;
+    }
+
     public SpongeSchematic(MutableBlockVolume backing, Map<Vector3i, TileEntityArchetype> tiles, Map<Vector3f, EntityArchetype> entities) {
         super(backing, tiles, entities);
         this.metadata = new MemoryDataContainer();
