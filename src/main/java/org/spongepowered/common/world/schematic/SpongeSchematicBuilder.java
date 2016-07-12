@@ -128,7 +128,7 @@ public class SpongeSchematicBuilder implements Schematic.Builder {
             final MutableBlockVolume volume;
             if (this.palette.getHighestId() <= 0xFF) {
                 volume = new ByteArrayMutableBlockBuffer(this.palette, min, size);
-            } else if (this.palette.getHighestId() <= 0xFF) {
+            } else if (this.palette.getHighestId() <= 0xFFFF) {
                 volume = new CharArrayMutableBlockBuffer(this.palette, min, size);
             } else {
                 volume = new IntArrayMutableBlockBuffer(this.palette, min, size);
